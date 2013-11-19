@@ -12,6 +12,6 @@ require.config({
     }
 });
 
-require(['react'], function (React) {
-  console.log('start');
+require(['react', 'jsx!components/calculator'], function (React, CalculatorComponent) {
+  React.renderComponent(new CalculatorComponent(), document.querySelector('body'));
 });

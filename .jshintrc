@@ -3,6 +3,7 @@
   "unused": false,
   "globals": {
     "require": true,
+    "define": true,
     "console": true
   }
 }
