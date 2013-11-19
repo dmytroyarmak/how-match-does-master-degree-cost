@@ -1,0 +1,16 @@
+{
+  "name": "how-match-does-master-degree-cost",
+  "version": "0.0.0",
+  "authors": [
+    "Dmytro Yarmak <dyarmak@heliostech.hk>"
+  ],
+  "main": "index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
