@@ -1,6 +1,10 @@
 define(['react'], function(React) {
   return React.createClass({
-    getInitialState: function() {
+    componentDidUpdate: function() {
+      document.location.hash = this.getUrlStateHash();
+    },
+
+    getDefaulrState: function() {
       return {
         salary: 16000,
         tuition: 0,
@@ -12,6 +16,18 @@ define(['react'], function(React) {
         calculateSavedMoneyOfLiving: true,
         calculateSalaryLoss: true
       };
+    },
+
+    getInitialState: function() {
+      var urlState = this.getStateFromUrl(),
+          state = this.getDefaulrState(),
+          prop;
+      for (prop in state) {
+        if (state.hasOwnProperty(prop) && urlState.hasOwnProperty(prop)) {
+          state[prop] = urlState[prop];
+        }
+      }
+      return state;
     },
 
     getRealCost: function() {
@@ -40,6 +56,37 @@ define(['react'], function(React) {
 
     getCostOfApartment: function() {
       return (this.state.coupled) ? this.state.apartamentCost/2 : this.state.apartamentCost;
+    },
+
+    getUrlStateHash: function() {
+      var params = [],
+          prop;
+      for (prop in this.state) {
+        if ( this.state.hasOwnProperty(prop) ) {
+          params.push(prop + '=' + this.state[prop]);
+        }
+      }
+      return '#' + params.join('&');
+    },
+
+    getStateFromUrl: function() {
+      var params = {},
+          hash = window.location.hash,
+          pairs = hash.substring(1, hash.length).split('&');
+      pairs.forEach(function(pair) {
+        var result = pair.split('='),
+            key = result[0],
+            value = result[1];
+        if (value === 'true') {
+          value = true;
+        } else if (value === 'false') {
+          value = true;
+        } else {
+          value = parseInt(value || 0, 10);
+        }
+        params[key] = value;
+      });
+      return params;
     },
 
     handleSalaryChange: function(event) {
@@ -164,23 +211,23 @@ define(['react'], function(React) {
         <div>
           <div>
             <label>
+              Вартість навчання (за 1 рік):
+              <input type="text" maxLength="10" value={this.state.tuition} onChange={this.handleTuitionChange}/>
+            </label>
+          </div>
+          <div>
+            <label>
               Враховувати втрати заробітньої плати через навчання?
               <input type="checkbox" checked={this.state.calculateSalaryLoss} onChange={this.handleCalculateSalaryLossChange}/>
             </label>
           </div>
+          {this.state.calculateSalaryLoss ? this.renderSalaryFieldset() : ''}
           <div>
             <label>
               Враховувати економію на проживання у гуртожитку?
               <input type="checkbox" checked={this.state.calculateSavedMoneyOfLiving} onChange={this.handleCalculateSavedMoneyOfLivingChange}/>
             </label>
           </div>
-          <div>
-            <label>
-              Вартість навчання (за 1 рік):
-              <input type="text" maxLength="10" value={this.state.tuition} onChange={this.handleTuitionChange}/>
-            </label>
-          </div>
-          {this.state.calculateSalaryLoss ? this.renderSalaryFieldset() : ''}
           {this.state.calculateSavedMoneyOfLiving ? this.renderLivingFieldset() : ''}
           <h2>Результат</h2>
           <div>
