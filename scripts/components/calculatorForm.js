@@ -80,7 +80,7 @@ define(['react'], function(React) {
         if (value === 'true') {
           value = true;
         } else if (value === 'false') {
-          value = true;
+          value = false;
         } else {
           value = parseInt(value || 0, 10);
         }
