@@ -8,7 +8,9 @@ define(['react'], function(React) {
         hostelCost: 165,
         apartamentCost: 4000,
         coupled: true,
-        afterMonths: 12
+        afterMonths: 12,
+        calculateSavedMoneyOfLiving: true,
+        calculateSalaryLoss: true
       };
     },
 
@@ -17,7 +19,11 @@ define(['react'], function(React) {
     },
 
     getSalaryLoss: function() {
-      return this.state.salary * 18 * (1 - this.state.hoursPerWeek/40);
+      if (this.state.calculateSalaryLoss) {
+        return this.state.salary * 18 * (1 - this.state.hoursPerWeek/40);
+      } else {
+        return 0;
+      }
     },
 
     getFullTuitionCost: function() {
@@ -25,7 +31,11 @@ define(['react'], function(React) {
     },
 
     getSavedMoneyOfLiving: function() {
-      return this.state.afterMonths * (this.getCostOfApartment() - this.state.hostelCost);
+      if (this.state.calculateSavedMoneyOfLiving) {
+        return this.state.afterMonths * (this.getCostOfApartment() - this.state.hostelCost);
+      } else {
+        return 0;
+      }
     },
 
     getCostOfApartment: function() {
@@ -61,28 +71,18 @@ define(['react'], function(React) {
       this.setState({afterMonths: parseInt(event.target.value, 10)});
     },
 
-    render: function() {
+    handleCalculateSavedMoneyOfLivingChange: function(event) {
+      this.setState({calculateSavedMoneyOfLiving: !this.state.calculateSavedMoneyOfLiving});
+    },
+
+    handleCalculateSalaryLossChange: function(event) {
+      this.setState({calculateSalaryLoss: !this.state.calculateSalaryLoss});
+    },
+
+    renderLivingFieldset: function() {
       return (
         /* jshint ignore:start */
-        <div>
-          <div>
-            <label>
-              Моя заробітня плата (за повний робочий день):
-              <input type="text" maxLength="10" value={this.state.salary} onChange={this.handleSalaryChange}/>
-            </label>
-          </div>
-          <div>
-            <label>
-              Збираюсь працювати {this.state.hoursPerWeek} годин на тиждень:
-              20<input type="range" min="20" max="40" step="5" value={this.state.hoursPerWeek} onChange={this.handleHoursPerWeekChange}/>40
-            </label>
-          </div>
-          <div>
-            <label>
-              Вартість навчання (за 1 рік):
-              <input type="text" maxLength="10" value={this.state.tuition} onChange={this.handleTuitionChange}/>
-            </label>
-          </div>
+        <fieldset>
           <div>
             <label>
               Вартість проживання гуртожитку (в міс):
@@ -108,12 +108,86 @@ define(['react'], function(React) {
               0<input type="range" min="0" max="21" step="1" value={this.state.afterMonths} onChange={this.handleAfterMonthsChange}/>21
             </label>
           </div>
+        </fieldset>
+        /* jshint ignore:end */
+      );
+    },
+
+    renderSalaryFieldset: function() {
+      return (
+        /* jshint ignore:start */
+        <fieldset>
+          <div>
+            <label>
+              Моя заробітня плата (за повний робочий день):
+              <input type="text" maxLength="10" value={this.state.salary} onChange={this.handleSalaryChange}/>
+            </label>
+          </div>
+          <div>
+            <label>
+              Збираюсь працювати {this.state.hoursPerWeek} годин на тиждень:
+              20<input type="range" min="20" max="40" step="5" value={this.state.hoursPerWeek} onChange={this.handleHoursPerWeekChange}/>40
+            </label>
+          </div>
+        </fieldset>
+        /* jshint ignore:end */
+      );
+    },
+
+    renderFullTuitionCostResult: function() {
+      return (
+        /* jshint ignore:start */
+        <li>Повна вартість навчання: {Math.round(this.getFullTuitionCost())} грн</li>
+        /* jshint ignore:end */
+      );
+    },
+
+    renderSavedMoneyOfLivingResult: function() {
+      return (
+        /* jshint ignore:start */
+        <li>Економія на гуртожитку: {Math.round(this.getSavedMoneyOfLiving())} грн</li>
+        /* jshint ignore:end */
+      );
+    },
+
+    renderSalaryLossResult: function() {
+      return (
+        /* jshint ignore:start */
+        <li>Втрачені гроші на роботі: {Math.round(this.getSalaryLoss())} грн</li>
+        /* jshint ignore:end */
+      );
+    },
+
+    render: function() {
+      return (
+        /* jshint ignore:start */
+        <div>
+          <div>
+            <label>
+              Враховувати втрати заробітньої плати через навчання?
+              <input type="checkbox" checked={this.state.calculateSalaryLoss} onChange={this.handleCalculateSalaryLossChange}/>
+            </label>
+          </div>
+          <div>
+            <label>
+              Враховувати економію на проживання у гуртожитку?
+              <input type="checkbox" checked={this.state.calculateSavedMoneyOfLiving} onChange={this.handleCalculateSavedMoneyOfLivingChange}/>
+            </label>
+          </div>
+          <div>
+            <label>
+              Вартість навчання (за 1 рік):
+              <input type="text" maxLength="10" value={this.state.tuition} onChange={this.handleTuitionChange}/>
+            </label>
+          </div>
+          {this.state.calculateSalaryLoss ? this.renderSalaryFieldset() : ''}
+          {this.state.calculateSavedMoneyOfLiving ? this.renderLivingFieldset() : ''}
           <h2>Результат</h2>
           <div>
             <ul>
-              <li>Повна вартість навчання: {Math.round(this.getFullTuitionCost())} грн</li>
-              <li>Втрачені гроші на роботі: {Math.round(this.getSalaryLoss())} грн</li>
-              <li>Економія на гуртожитку: {Math.round(this.getSavedMoneyOfLiving())} грн</li>
+              {this.state.calculateSavedMoneyOfLiving || this.state.calculateSalaryLoss ? this.renderFullTuitionCostResult() : ''}
+              {this.state.calculateSavedMoneyOfLiving ? this.renderSavedMoneyOfLivingResult() : ''}
+              {this.state.calculateSalaryLoss ? this.renderSalaryLossResult() : ''}
               <li>Диплом магістра коштуватиме вам: <strong>{Math.round(this.getRealCost())} грн</strong></li>
             </ul>
           </div>
