@@ -1,4 +1,4 @@
-how-match-does-master-degree-cost
+how-much-does-master-degree-cost
 =================================
 
 Calculator of master degree's real cost
